@@ -6,8 +6,8 @@ import {
 } from "@heroicons/react/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React from "react";
 import Languages from "../../components/languages";
+import moment from "moment";
 
 const game = {
   release_date: "2022-01-11T12:36:38",
@@ -23,6 +23,7 @@ const SingleGame: React.FC = () => {
   const {
     query: { gameId },
   } = router;
+
   return (
     <>
       <Header title="Need for speed" />
@@ -58,13 +59,16 @@ const SingleGame: React.FC = () => {
                 Release Date
               </dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {game.release_date}
+                {moment(game.release_date).format("LLLL")}
               </dd>
             </div>
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
               <dt className="text-sm font-medium text-gray-500">Languages</dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                <Languages available_languages={game.available_languages} showAll />
+                <Languages
+                  available_languages={game.available_languages}
+                  showAll
+                />
               </dd>
             </div>
             <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">

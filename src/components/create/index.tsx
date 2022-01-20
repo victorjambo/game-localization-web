@@ -1,6 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
+import DatePicker from "react-datepicker";
 import Modal from "../modal";
+import moment from "moment";
 
 interface IProps {
   openModal: boolean;
@@ -14,7 +16,9 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
     watch,
     formState: { errors },
   } = useForm();
-  const onSubmit = (data) => console.log(data);
+  const [startDate, setStartDate] = useState(new Date());
+
+  const onSubmit = (data) => console.log(data, moment(startDate).format());
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -38,11 +42,15 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 <input
                   type="text"
                   id="gameName"
-                  className={`rounded-md px-5 py-4 w-full border ${errors.gameName ? "border-red-500" : "border-gray-400"} hover:border-gray-600`}
+                  className={`rounded-md px-5 py-4 w-full border ${
+                    errors.gameName ? "border-red-500" : "border-gray-400"
+                  } hover:border-gray-600`}
                   {...register("gameName", { required: true })}
                 />
               </div>
-              <p className="text-red-500 text-xs">{errors.gameName?.type === "required" && "Name is required"}</p>
+              <p className="text-red-500 text-xs">
+                {errors.gameName?.type === "required" && "Name is required"}
+              </p>
             </div>
 
             <div className="w-full">
@@ -53,14 +61,24 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 Release Date
               </label>
               <div className="mt-1">
-                <input
+                <DatePicker
+                  className={`rounded-md px-5 py-4 w-full border border-gray-400 hover:border-gray-600`}
+                  selected={startDate}
+                  startDate={startDate}
+                  minDate={startDate}
+                  onChange={(date) => setStartDate(date)}
+                />
+                {/* <input
                   type="text"
                   id="releaseDate"
                   className={`rounded-md px-5 py-4 w-full border ${errors.gameName ? "border-red-500" : "border-gray-400"} hover:border-gray-600`}
                   {...register("releaseDate", { required: true })}
-                />
+                /> */}
               </div>
-              <p className="text-red-500 text-xs">{errors.releaseDate?.type === "required" && "Release Date is required"}</p>
+              <p className="text-red-500 text-xs">
+                {errors.releaseDate?.type === "required" &&
+                  "Release Date is required"}
+              </p>
             </div>
 
             <div className="w-full">
@@ -74,11 +92,16 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 <input
                   type="text"
                   id="languages"
-                  className={`rounded-md px-5 py-4 w-full border ${errors.gameName ? "border-red-500" : "border-gray-400"} hover:border-gray-600`}
+                  className={`rounded-md px-5 py-4 w-full border ${
+                    errors.gameName ? "border-red-500" : "border-gray-400"
+                  } hover:border-gray-600`}
                   {...register("languages", { required: true })}
                 />
               </div>
-              <p className="text-red-500 text-xs">{errors.languages?.type === "required" && "languages is required"}</p>
+              <p className="text-red-500 text-xs">
+                {errors.languages?.type === "required" &&
+                  "languages is required"}
+              </p>
             </div>
 
             <div className="w-full">
@@ -92,11 +115,14 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 <input
                   type="number"
                   id="words"
-                  className={`rounded-md px-5 py-4 w-full border ${errors.gameName ? "border-red-500" : "border-gray-400"} hover:border-gray-600`}
+                  className={`rounded-md px-5 py-4 w-full border ${
+                    errors.gameName ? "border-red-500" : "border-gray-400"
+                  } hover:border-gray-600`}
                   {...register("words", { min: 0, required: true })}
                 />
                 <p className="text-red-500 text-xs">
-                  {errors.words?.type === "required" && "No. of words is required"}
+                  {errors.words?.type === "required" &&
+                    "No. of words is required"}
                   {errors.words?.type === "min" && "No. of words should be > 0"}
                 </p>
               </div>
@@ -106,6 +132,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
               <button
                 className="py-3 px-6 bg-gray-200 hover:bg-gray-300 text-center rounded-md"
                 onClick={handleCancel}
+                type="reset"
               >
                 Cancel
               </button>

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 import { AppState } from "@/state";
 import Header from "../../components/header";
 import Link from "next/link";
+import moment from "moment";
 
 const Games = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -72,7 +73,7 @@ const Games = () => {
                             </div>
                           </td>
                           <td className="table-cell px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">
-                            {game.release_date}
+                            {moment(game.release_date).format("LLLL")}
                           </td>
                           <td className="px-6 py-3 text-sm text-gray-500 font-medium">
                             <Languages
