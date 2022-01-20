@@ -2,7 +2,7 @@
 import Languages from "../../components/languages";
 import { PlusIcon } from "@heroicons/react/solid";
 import { useState } from "react";
-import Modal from "../../components/modal";
+import CreateGame from "../../components/create";
 
 const games = [
   {
@@ -34,6 +34,7 @@ const Games = () => {
                 <button
                   type="button"
                   className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  onClick={() => setOpenModal(true)}
                 >
                   <PlusIcon className="w-4 h-4" />
                   <span>Create</span>
@@ -63,7 +64,6 @@ const Games = () => {
                       <tr
                         key={game.id}
                         className="hover:bg-gray-50"
-                        onClick={() => setOpenModal(true)}
                       >
                         <td className="px-6 py-3 max-w-0 w-full whitespace-nowrap text-sm font-medium text-gray-900">
                           <div className="flex items-center space-x-3">
@@ -89,9 +89,7 @@ const Games = () => {
           </div>
         </div>
       </div>
-      <Modal isOpen={openModal} handleCloseModal={setOpenModal}>
-        <div>hello world</div>
-      </Modal>
+      <CreateGame {...{ openModal, setOpenModal }} />
     </>
   );
 };
