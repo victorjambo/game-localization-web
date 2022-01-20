@@ -3,20 +3,15 @@ import Languages from "../../components/languages";
 import { PlusIcon } from "@heroicons/react/solid";
 import { useState } from "react";
 import CreateGame from "../../components/create";
-
-const games = [
-  {
-    created_at: "2022-01-19T19:50:56.101083",
-    release_date: "2022-01-11T15:36:38",
-    id: "0594cb67-221e-402b-b865-d65df50834a0",
-    name: "God of war",
-    word_count: 123,
-    available_languages: ["en", "de", "ru", "it", "ko", "pt"],
-  },
-];
+import { useSelector } from "react-redux";
+import { AppState } from "@/state";
 
 const Games = () => {
   const [openModal, setOpenModal] = useState(false);
+
+  const {
+    gamesReducer: { games },
+  } = useSelector((state: AppState) => state);
 
   return (
     <>
@@ -61,10 +56,7 @@ const Games = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-100">
                     {games.map((game) => (
-                      <tr
-                        key={game.id}
-                        className="hover:bg-gray-50"
-                      >
+                      <tr key={game.id} className="hover:bg-gray-50">
                         <td className="px-6 py-3 max-w-0 w-full whitespace-nowrap text-sm font-medium text-gray-900">
                           <div className="flex items-center space-x-3">
                             <div className="truncate hover:text-gray-600">
