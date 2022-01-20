@@ -77,6 +77,13 @@ const SingleGame: React.FC = () => {
               </dt>
               <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                 {game.word_count}
+                {/* <div className="flex flex-row space-x-2 items-center">
+                  <input
+                    type="text"
+                    className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
+                  />
+                  <button className="font-semibold text-purple-600 hover:text-purple-700">Save</button>
+                </div> */}
               </dd>
             </div>
 
