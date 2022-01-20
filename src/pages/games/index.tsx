@@ -5,6 +5,8 @@ import { useState } from "react";
 import CreateGame from "../../components/create";
 import { useSelector } from "react-redux";
 import { AppState } from "@/state";
+import Header from "../../components/header";
+import Link from "next/link";
 
 const Games = () => {
   const [openModal, setOpenModal] = useState(false);
@@ -15,6 +17,7 @@ const Games = () => {
 
   return (
     <>
+      <Header />
       <div className="px-10p">
         <div className="flex flex-col">
           <div className="flex-1">
@@ -56,23 +59,28 @@ const Games = () => {
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-100">
                     {games.map((game) => (
-                      <tr key={game.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-3 max-w-0 w-full whitespace-nowrap text-sm font-medium text-gray-900">
-                          <div className="flex items-center space-x-3">
-                            <div className="truncate hover:text-gray-600">
-                              <span>{game.name}</span>
+                      <Link href={`/games/${game.id}`} key={game.id} passHref>
+                        <tr
+                          key={game.id}
+                          className="hover:bg-gray-50 cursor-pointer"
+                        >
+                          <td className="px-6 py-3 max-w-0 w-full whitespace-nowrap text-sm font-medium text-gray-900">
+                            <div className="flex items-center space-x-3">
+                              <div className="truncate hover:text-gray-600">
+                                <span>{game.name}</span>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="table-cell px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">
-                          {game.release_date}
-                        </td>
-                        <td className="px-6 py-3 text-sm text-gray-500 font-medium">
-                          <Languages
-                            available_languages={game.available_languages}
-                          />
-                        </td>
-                      </tr>
+                          </td>
+                          <td className="table-cell px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">
+                            {game.release_date}
+                          </td>
+                          <td className="px-6 py-3 text-sm text-gray-500 font-medium">
+                            <Languages
+                              available_languages={game.available_languages}
+                            />
+                          </td>
+                        </tr>
+                      </Link>
                     ))}
                   </tbody>
                 </table>
