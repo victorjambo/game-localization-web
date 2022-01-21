@@ -3,7 +3,7 @@ import "../styles/globals.css";
 
 import type { AppProps } from "next/app";
 
-import { store } from "../state";
+import { store } from "@/state";
 import { Provider } from "react-redux";
 
 const App = ({ Component, pageProps }: AppProps) => {

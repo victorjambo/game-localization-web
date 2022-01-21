@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit'
-import { http } from '../../utils/http'
+import { http } from '@/utils/http'
 
 export const fetchGames = createAsyncThunk(
   'games/fetchGames',
@@ -25,13 +25,20 @@ export const deleteGame = async (gameId: string) => {
     .catch(() => false)
 }
 
-export const createGame = async (game) => {
+export const createGame = async (game: IGameUpdate) => {
   return await http.post(`/games`, game)
     .then(res => res.data)
     .catch(() => false)
 }
 
-export const updateGame = async (gameId, game) => {
+export interface IGameUpdate {
+  release_date?: string;
+  name?: string;
+  word_count?: number;
+  available_languages?: string[];
+}
+
+export const updateGame = async (gameId: string, game: IGameUpdate) => {
   return await http.put(`/games/${gameId}`, game)
     .then(res => res.data)
     .catch(() => false)

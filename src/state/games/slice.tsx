@@ -48,7 +48,7 @@ const gamesSlice = createSlice({
     },
     updateGameField(state, action: PayloadAction<{field: string, value: string}>) {
       const { field, value } = action.payload;
-      state.game[field] = value;
+      (state.game as any)[field] = value;
     }
   },
   extraReducers: (builder) => {

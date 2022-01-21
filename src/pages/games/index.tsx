@@ -1,15 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
-import Languages from "../../components/languages";
+import Languages from "@/components/languages";
 import { PlusIcon } from "@heroicons/react/solid";
 import { useEffect, useState } from "react";
-import CreateGame from "../../components/create";
+import CreateGame from "@/components/create";
 import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "@/state";
-import Header from "../../components/header";
+import Header from "@/components/header";
 import Link from "next/link";
 import moment from "moment";
-import { fetchGames } from "../../state/games/thunkActions";
-import Loader from "../../components/loader";
+import { fetchGames } from "@/state/games/thunkActions";
+import Loader from "@/components/loader";
 
 const Games = () => {
   const dispatch = useDispatch();

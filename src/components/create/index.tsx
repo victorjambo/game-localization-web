@@ -1,10 +1,10 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
-import Modal from "../modal";
+import Modal from "@/components/modal";
 import moment from "moment";
-import { createGame } from "../../state/games/thunkActions";
-import { appendGame } from "../../state/games/slice";
+import { createGame } from "@/state/games/thunkActions";
+import { appendGame } from "@/state/games/slice";
 import { useDispatch } from "react-redux";
 
 interface IProps {
@@ -88,7 +88,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                   selected={startDate}
                   startDate={startDate}
                   minDate={startDate}
-                  onChange={(date) => setStartDate(date)}
+                  onChange={(date) => setStartDate(date as any)}
                 />
               </div>
               <p className="text-red-500 text-xs">

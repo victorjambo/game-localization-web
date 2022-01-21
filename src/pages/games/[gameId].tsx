@@ -1,14 +1,13 @@
-import Header from "../../components/header";
+import Header from "@/components/header";
 import {
   ChevronLeftIcon,
   ExclamationCircleIcon,
-  InformationCircleIcon,
   PencilAltIcon,
   TrashIcon,
 } from "@heroicons/react/solid";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import Languages from "../../components/languages";
+import Languages from "@/components/languages";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,11 +15,11 @@ import {
   deleteGame,
   fetchGame,
   updateGame,
-} from "../../state/games/thunkActions";
-import { updateGameField } from "../../state/games/slice";
+} from "@/state/games/thunkActions";
+import { updateGameField } from "@/state/games/slice";
 import { AppState } from "@/state";
-import Loader from "../../components/loader";
-import Modal from "../../components/modal";
+import Loader from "@/components/loader";
+import Modal from "@/components/modal";
 import DatePicker from "react-datepicker";
 
 const toggleAll = {
@@ -80,8 +79,8 @@ const SingleGame: React.FC = () => {
         [field]: false,
       };
     });
-    await updateGame(gameId, {
-      [field]: game[field],
+    await updateGame(gameId as string, {
+      [field]: (game as any)[field],
     });
   };
 
