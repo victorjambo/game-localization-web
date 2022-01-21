@@ -1,20 +1,27 @@
 /* eslint-disable @next/next/no-img-element */
 import Languages from "../../components/languages";
 import { PlusIcon } from "@heroicons/react/solid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateGame from "../../components/create";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AppState } from "@/state";
 import Header from "../../components/header";
 import Link from "next/link";
 import moment from "moment";
+import { fetchGames } from "../../state/games/thunkActions";
+import Loader from "../../components/loader";
 
 const Games = () => {
+  const dispatch = useDispatch();
   const [openModal, setOpenModal] = useState(false);
 
   const {
-    gamesReducer: { games },
+    gamesReducer: { games, loadingGames: loading },
   } = useSelector((state: AppState) => state);
+
+  useEffect(() => {
+    dispatch(fetchGames());
+  }, [dispatch]);
 
   return (
     <>
@@ -68,17 +75,31 @@ const Games = () => {
                           <td className="px-6 py-3 max-w-0 w-full whitespace-nowrap text-sm font-medium text-gray-900">
                             <div className="flex items-center space-x-3">
                               <div className="truncate hover:text-gray-600">
-                                <span>{game.name}</span>
+                                {loading ? (
+                                  <Loader />
+                                ) : (
+                                  <span>{game.name}</span>
+                                )}
                               </div>
                             </div>
                           </td>
                           <td className="table-cell px-6 py-3 whitespace-nowrap text-sm text-gray-500 text-right">
-                            {moment(game.release_date).format("LLLL")}
+                            {loading ? (
+                              <Loader />
+                            ) : (
+                              <span>
+                                {moment(game.release_date).format("LLLL")}
+                              </span>
+                            )}
                           </td>
                           <td className="px-6 py-3 text-sm text-gray-500 font-medium">
-                            <Languages
-                              available_languages={game.available_languages}
-                            />
+                            {loading ? (
+                              <Loader />
+                            ) : (
+                              <Languages
+                                available_languages={game.available_languages}
+                              />
+                            )}
                           </td>
                         </tr>
                       </Link>

@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { fetchGames, fetchGame } from "./thunkActions";
 
 interface IGame {
   created_at: string;
@@ -11,24 +12,58 @@ interface IGame {
 
 interface IGamesState {
   games: IGame[];
+  game: IGame;
+  loadingGames: boolean;
+  errorGames: boolean;
+  loadingGame: boolean;
+  errorGame: boolean;
+  gameNotFound: boolean;
 }
 const initialState: IGamesState = {
-  games: [
-    {
-      created_at: "2022-01-19T19:50:56.101083",
-      release_date: "2022-01-11T15:36:38",
-      id: "0594cb67-221e-402b-b865-d65df50834a0",
-      name: "God of war",
-      word_count: 123,
-      available_languages: ["en", "de", "ru", "it", "ko", "pt"],
-    },
-  ],
+  games: [],
+  game: undefined,
+  loadingGames: false,
+  errorGames: false,
+  loadingGame: false,
+  gameNotFound: false,
 };
 
 const gamesSlice = createSlice({
   name: "modal",
   initialState,
   reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(
+        fetchGames.fulfilled,
+        (state, action: PayloadAction<{ games: IGame[] }>) => {
+          state.loadingGames = false;
+          state.games = action.payload.games;
+        }
+      )
+      .addCase(fetchGames.pending, (state) => {
+        state.loadingGames = true;
+      })
+      .addCase(fetchGames.rejected, (state) => {
+        state.errorGames = true;
+      })
+      .addCase(fetchGame.fulfilled, (state, action: PayloadAction<IGame>) => {
+        state.loadingGame = false;
+        if (action.payload) {
+          state.game = action.payload;
+          state.gameNotFound = false;
+        } else {
+          state.gameNotFound = true;
+          state.game = undefined;
+        }
+      })
+      .addCase(fetchGame.pending, (state) => {
+        state.loadingGame = true;
+      })
+      .addCase(fetchGame.rejected, (state) => {
+        state.loadingGame = true;
+      });
+  },
 });
 
 // export const {} = gamesSlice.actions;

@@ -1,6 +1,8 @@
 import Header from "../../components/header";
 import {
   ChevronLeftIcon,
+  ExclamationCircleIcon,
+  InformationCircleIcon,
   PencilAltIcon,
   TrashIcon,
 } from "@heroicons/react/solid";
@@ -8,21 +10,26 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Languages from "../../components/languages";
 import moment from "moment";
-
-const game = {
-  release_date: "2022-01-11T12:36:38",
-  created_at: "2022-01-20T18:39:38.689600",
-  id: "7e934bba-0afd-4a41-9353-5806884b066c",
-  name: "God of war",
-  word_count: 123,
-  available_languages: ["en", "de", "ru", "it", "ko", "pt"],
-};
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchGame } from "../../state/games/thunkActions";
+import { AppState } from "@/state";
+import Loader from "../../components/loader";
 
 const SingleGame: React.FC = () => {
   const router = useRouter();
+  const dispatch = useDispatch();
   const {
     query: { gameId },
   } = router;
+
+  const {
+    gamesReducer: { game, loadingGame: loading, gameNotFound },
+  } = useSelector((state: AppState) => state);
+
+  useEffect(() => {
+    dispatch(fetchGame(gameId as string));
+  }, [dispatch, gameId]);
 
   return (
     <>
@@ -36,68 +43,101 @@ const SingleGame: React.FC = () => {
                 <span>Back to games</span>
               </div>
             </Link>
-            <button
-              type="button"
-              className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-            >
-              <TrashIcon className="w-5 h-5" />
-              <span>Delete Game</span>
-            </button>
+            {!gameNotFound && (
+              <button
+                type="button"
+                className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+              >
+                <TrashIcon className="w-5 h-5" />
+                <span>Delete Game</span>
+              </button>
+            )}
           </div>
-          <div className="text-3xl">{game.name}</div>
+          {!gameNotFound && (
+            <span>
+              {loading || !game?.name ? (
+                <Loader />
+              ) : (
+                <div className="text-3xl">{game.name}</div>
+              )}
+            </span>
+          )}
         </div>
-        <div className="mt-5 border-t border-gray-200">
-          <dl className="sm:divide-y sm:divide-gray-200">
-            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-              <dt className="text-sm font-medium text-gray-500">Game name</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {game.name}
-              </dd>
-            </div>
-            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-              <dt className="text-sm font-medium text-gray-500">
-                Release Date
-              </dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {moment(game.release_date).format("LLLL")}
-              </dd>
-            </div>
-            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-              <dt className="text-sm font-medium text-gray-500">Languages</dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                <Languages
-                  available_languages={game.available_languages}
-                  showAll
-                />
-              </dd>
-            </div>
-            <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
-              <dt className="text-sm font-medium text-gray-500">
-                Number of words
-              </dt>
-              <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                {game.word_count}
-                {/* <div className="flex flex-row space-x-2 items-center">
+        {gameNotFound ? (
+          <div className="mt-5 border-t border-gray-200 flex flex-col justify-center items-center">
+            <ExclamationCircleIcon className="w-52 h-52" />
+            <span className="text-3xl">Game Not found</span>
+          </div>
+        ) : (
+          <div className="mt-5 border-t border-gray-200">
+            <dl className="sm:divide-y sm:divide-gray-200">
+              <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt className="text-sm font-medium text-gray-500">Game name</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {loading || !game?.name ? (
+                    <Loader />
+                  ) : (
+                    <span>{game.name}</span>
+                  )}
+                </dd>
+              </div>
+              <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt className="text-sm font-medium text-gray-500">
+                  Release Date
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {loading || !game?.release_date ? (
+                    <Loader />
+                  ) : (
+                    <span>{moment(game.release_date).format("LLLL")}</span>
+                  )}
+                </dd>
+              </div>
+              <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt className="text-sm font-medium text-gray-500">Languages</dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {loading || !game?.available_languages ? (
+                    <Loader />
+                  ) : (
+                    <Languages
+                      available_languages={game.available_languages}
+                      showAll
+                    />
+                  )}
+                </dd>
+              </div>
+              <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
+                <dt className="text-sm font-medium text-gray-500">
+                  Number of words
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                  {loading || !game?.word_count ? (
+                    <Loader />
+                  ) : (
+                    <span>{game.word_count}</span>
+                  )}
+                  {/* <div className="flex flex-row space-x-2 items-center">
                   <input
                     type="text"
                     className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
                   />
                   <button className="font-semibold text-purple-600 hover:text-purple-700">Save</button>
                 </div> */}
-              </dd>
-            </div>
+                </dd>
+              </div>
 
-            <div className="py-4 flex justify-end">
-              <button
-                type="button"
-                className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-              >
-                <PencilAltIcon className="w-5 h-5" />
-                <span>Update Game</span>
-              </button>
-            </div>
-          </dl>
-        </div>
+              <div className="py-4 flex justify-end">
+                <button
+                  type="button"
+                  className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                >
+                  <PencilAltIcon className="w-5 h-5" />
+                  <span>Update Game</span>
+                </button>
+              </div>
+            </dl>
+          </div>
+        )}
       </div>
     </>
   );
