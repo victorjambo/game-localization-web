@@ -1,6 +1,15 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { fetchGames, fetchGame } from "./thunkActions";
 
+export const defaultGame = {
+  created_at: "",
+  release_date: "",
+  id: "",
+  name: "",
+  word_count: 0,
+  available_languages: [],
+}
+
 interface IGame {
   created_at: string;
   release_date: string;
@@ -19,11 +28,13 @@ interface IGamesState {
   errorGame: boolean;
   gameNotFound: boolean;
 }
+
 const initialState: IGamesState = {
   games: [],
-  game: undefined,
+  game: defaultGame,
   loadingGames: false,
   errorGames: false,
+  errorGame: false,
   loadingGame: false,
   gameNotFound: false,
 };
@@ -35,6 +46,10 @@ const gamesSlice = createSlice({
     appendGame(state, action: PayloadAction<IGame>) {
       state.games.push(action.payload)
     },
+    updateGameField(state, action: PayloadAction<{field: string, value: string}>) {
+      const { field, value } = action.payload;
+      state.game[field] = value;
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -58,7 +73,7 @@ const gamesSlice = createSlice({
           state.gameNotFound = false;
         } else {
           state.gameNotFound = true;
-          state.game = undefined;
+          state.game = defaultGame;
         }
       })
       .addCase(fetchGame.pending, (state) => {
@@ -70,5 +85,5 @@ const gamesSlice = createSlice({
   },
 });
 
-export const { appendGame } = gamesSlice.actions;
+export const { appendGame, updateGameField } = gamesSlice.actions;
 export default gamesSlice.reducer;

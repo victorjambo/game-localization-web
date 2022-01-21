@@ -30,3 +30,9 @@ export const createGame = async (game) => {
     .then(res => res.data)
     .catch(() => false)
 }
+
+export const updateGame = async (gameId, game) => {
+  return await http.put(`/games/${gameId}`, game)
+    .then(res => res.data)
+    .catch(() => false)
+}

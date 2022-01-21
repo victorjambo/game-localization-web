@@ -90,12 +90,6 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                   minDate={startDate}
                   onChange={(date) => setStartDate(date)}
                 />
-                {/* <input
-                  type="text"
-                  id="releaseDate"
-                  className={`rounded-md px-5 py-4 w-full border ${errors.gameName ? "border-red-500" : "border-gray-400"} hover:border-gray-600`}
-                  {...register("releaseDate", { required: true })}
-                /> */}
               </div>
               <p className="text-red-500 text-xs">
                 {errors.releaseDate?.type === "required" &&

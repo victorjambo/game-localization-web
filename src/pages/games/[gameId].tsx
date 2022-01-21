@@ -12,10 +12,34 @@ import Languages from "../../components/languages";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteGame, fetchGame } from "../../state/games/thunkActions";
+import {
+  deleteGame,
+  fetchGame,
+  updateGame,
+} from "../../state/games/thunkActions";
+import { updateGameField } from "../../state/games/slice";
 import { AppState } from "@/state";
 import Loader from "../../components/loader";
 import Modal from "../../components/modal";
+import DatePicker from "react-datepicker";
+
+const toggleAll = {
+  created_at: true,
+  release_date: true,
+  id: true,
+  name: true,
+  word_count: true,
+  available_languages: true,
+};
+
+const NottoggleAll = {
+  created_at: false,
+  release_date: false,
+  id: false,
+  name: false,
+  word_count: false,
+  available_languages: false,
+};
 
 const SingleGame: React.FC = () => {
   const router = useRouter();
@@ -25,6 +49,14 @@ const SingleGame: React.FC = () => {
   } = router;
 
   const [isDeleteModal, closeDeleteModal] = useState(false);
+  const [isEditable, setEditable] = useState({
+    created_at: false,
+    release_date: false,
+    id: false,
+    name: false,
+    word_count: false,
+    available_languages: false,
+  });
 
   const {
     gamesReducer: { game, loadingGame: loading, gameNotFound },
@@ -37,8 +69,20 @@ const SingleGame: React.FC = () => {
   const handleDelete = async () => {
     const response = await deleteGame(gameId as string);
     if (response === 204) {
-      router.push("/games")
+      router.push("/games");
     }
+  };
+
+  const handleSave = async (field: string) => {
+    setEditable((prev) => {
+      return {
+        ...prev,
+        [field]: false,
+      };
+    });
+    await updateGame(gameId, {
+      [field]: game[field],
+    });
   };
 
   return (
@@ -69,7 +113,7 @@ const SingleGame: React.FC = () => {
               {loading || !game?.name ? (
                 <Loader />
               ) : (
-                <div className="text-3xl">{game.name}</div>
+                <div className="text-3xl">{!isEditable.name && game.name}</div>
               )}
             </span>
           )}
@@ -85,10 +129,36 @@ const SingleGame: React.FC = () => {
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500">Game name</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {loading || !game?.name ? (
-                    <Loader />
+                  {isEditable.name ? (
+                    <div className="flex flex-row space-x-2 items-center">
+                      <input
+                        type="text"
+                        value={game.name}
+                        onChange={(e) =>
+                          dispatch(
+                            updateGameField({
+                              field: "name",
+                              value: e.target.value,
+                            })
+                          )
+                        }
+                        className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
+                      />
+                      <button
+                        className="font-semibold text-purple-600 hover:text-purple-700"
+                        onClick={() => handleSave("name")}
+                      >
+                        Save
+                      </button>
+                    </div>
                   ) : (
-                    <span>{game.name}</span>
+                    <span>
+                      {loading || !game?.name ? (
+                        <Loader />
+                      ) : (
+                        <span>{game.name}</span>
+                      )}
+                    </span>
                   )}
                 </dd>
               </div>
@@ -97,23 +167,68 @@ const SingleGame: React.FC = () => {
                   Release Date
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {loading || !game?.release_date ? (
-                    <Loader />
+                  {isEditable.release_date ? (
+                    <div className="flex flex-row space-x-2 items-center">
+                      <DatePicker
+                        className={`rounded-md px-5 py-4 w-full border border-gray-400 hover:border-gray-600`}
+                        selected={new Date(game.release_date)}
+                        startDate={new Date()}
+                        minDate={new Date()}
+                        onChange={(date) =>
+                          dispatch(
+                            updateGameField({
+                              field: "release_date",
+                              value: moment(date).format(),
+                            })
+                          )
+                        }
+                      />
+                      <button
+                        className="font-semibold text-purple-600 hover:text-purple-700"
+                        onClick={() => handleSave("release_date")}
+                      >
+                        Save
+                      </button>
+                    </div>
                   ) : (
-                    <span>{moment(game.release_date).format("LLLL")}</span>
+                    <span>
+                      {loading || !game?.release_date ? (
+                        <Loader />
+                      ) : (
+                        <span>{moment(game.release_date).format("LLLL")}</span>
+                      )}
+                    </span>
                   )}
                 </dd>
               </div>
               <div className="py-4 sm:py-5 sm:grid sm:grid-cols-3 sm:gap-4">
                 <dt className="text-sm font-medium text-gray-500">Languages</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {loading || !game?.available_languages ? (
-                    <Loader />
+                  {isEditable.available_languages ? (
+                    <div className="flex flex-row space-x-2 items-center">
+                      <input
+                        type="text"
+                        defaultValue={game.available_languages.join(",")}
+                        className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
+                      />
+                      <button
+                        className="font-semibold text-purple-600 hover:text-purple-700"
+                        onClick={() => handleSave("available_languages")}
+                      >
+                        Save
+                      </button>
+                    </div>
                   ) : (
-                    <Languages
-                      available_languages={game.available_languages}
-                      showAll
-                    />
+                    <span>
+                      {loading || !game?.available_languages ? (
+                        <Loader />
+                      ) : (
+                        <Languages
+                          available_languages={game.available_languages}
+                          showAll
+                        />
+                      )}
+                    </span>
                   )}
                 </dd>
               </div>
@@ -122,18 +237,29 @@ const SingleGame: React.FC = () => {
                   Number of words
                 </dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                  {loading || !game?.word_count ? (
-                    <Loader />
+                  {isEditable.word_count ? (
+                    <div className="flex flex-row space-x-2 items-center">
+                      <input
+                        type="number"
+                        defaultValue={game.word_count}
+                        className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
+                      />
+                      <button
+                        className="font-semibold text-purple-600 hover:text-purple-700"
+                        onClick={() => handleSave("word_count")}
+                      >
+                        Save
+                      </button>
+                    </div>
                   ) : (
-                    <span>{game.word_count}</span>
+                    <span>
+                      {loading || !game?.word_count ? (
+                        <Loader />
+                      ) : (
+                        <span>{game.word_count}</span>
+                      )}
+                    </span>
                   )}
-                  {/* <div className="flex flex-row space-x-2 items-center">
-                  <input
-                    type="text"
-                    className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
-                  />
-                  <button className="font-semibold text-purple-600 hover:text-purple-700">Save</button>
-                </div> */}
                 </dd>
               </div>
 
@@ -141,6 +267,7 @@ const SingleGame: React.FC = () => {
                 <button
                   type="button"
                   className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  onClick={() => setEditable(toggleAll)}
                 >
                   <PencilAltIcon className="w-5 h-5" />
                   <span>Update Game</span>
