@@ -26,7 +26,7 @@ const Games = () => {
   return (
     <>
       <Header />
-      <div className="px-10p">
+      <div className="px-10p" data-testid="games">
         <div className="flex flex-col">
           <div className="flex-1">
             {/* Page title & actions */}
@@ -66,7 +66,7 @@ const Games = () => {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-100">
-                    {games.map((game) => (
+                    {games && games.map((game) => (
                       <Link href={`/games/${game.id}`} key={game.id} passHref>
                         <tr
                           key={game.id}

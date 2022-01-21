@@ -3,6 +3,7 @@ import {
   ChevronLeftIcon,
   ExclamationCircleIcon,
   PencilAltIcon,
+  StopIcon,
   TrashIcon,
 } from "@heroicons/react/solid";
 import Link from "next/link";
@@ -11,18 +12,15 @@ import Languages from "@/components/languages";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  deleteGame,
-  fetchGame,
-  updateGame,
-} from "@/state/games/thunkActions";
+import { deleteGame, fetchGame, updateGame } from "@/state/games/thunkActions";
 import { updateGameField } from "@/state/games/slice";
 import { AppState } from "@/state";
 import Loader from "@/components/loader";
 import Modal from "@/components/modal";
 import DatePicker from "react-datepicker";
+import LanguageTags from "@/components/languages/LanguageTags";
 
-const toggleAll = {
+const setTrue = {
   created_at: true,
   release_date: true,
   id: true,
@@ -31,7 +29,7 @@ const toggleAll = {
   available_languages: true,
 };
 
-const NottoggleAll = {
+const setFalse = {
   created_at: false,
   release_date: false,
   id: false,
@@ -48,6 +46,7 @@ const SingleGame: React.FC = () => {
   } = router;
 
   const [isDeleteModal, closeDeleteModal] = useState(false);
+  const [canDispatch, setCanDispatch] = useState(false);
   const [isEditable, setEditable] = useState({
     created_at: false,
     release_date: false,
@@ -61,9 +60,27 @@ const SingleGame: React.FC = () => {
     gamesReducer: { game, loadingGame: loading, gameNotFound },
   } = useSelector((state: AppState) => state);
 
+  const [languages, setLanguages] = useState<string[]>(
+    game.available_languages
+  );
+
+  const isEditMode = Object.values(isEditable).some((i) => i);
+
   useEffect(() => {
     dispatch(fetchGame(gameId as string));
   }, [dispatch, gameId]);
+
+  useEffect(() => {
+    if (canDispatch) {
+      dispatch(
+        updateGameField({
+          field: "available_languages",
+          value: languages,
+        })
+      );
+      setCanDispatch(false);
+    }
+  }, [dispatch, canDispatch]);
 
   const handleDelete = async () => {
     const response = await deleteGame(gameId as string);
@@ -141,7 +158,7 @@ const SingleGame: React.FC = () => {
                             })
                           )
                         }
-                        className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
+                        className={`rounded-md px-5 py-2 w-full border hover:border-gray-600`}
                       />
                       <button
                         className="font-semibold text-purple-600 hover:text-purple-700"
@@ -169,7 +186,7 @@ const SingleGame: React.FC = () => {
                   {isEditable.release_date ? (
                     <div className="flex flex-row space-x-2 items-center">
                       <DatePicker
-                        className={`rounded-md px-5 py-4 w-full border border-gray-400 hover:border-gray-600`}
+                        className={`rounded-md px-5 py-2 w-full border border-gray-400 hover:border-gray-600`}
                         selected={new Date(game.release_date)}
                         startDate={new Date()}
                         minDate={new Date()}
@@ -204,14 +221,10 @@ const SingleGame: React.FC = () => {
                 <dt className="text-sm font-medium text-gray-500">Languages</dt>
                 <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
                   {isEditable.available_languages ? (
-                    <div className="flex flex-row space-x-2 items-center">
-                      <input
-                        type="text"
-                        defaultValue={game.available_languages.join(",")}
-                        className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
-                      />
+                    <div className="flex flex-row items-center">
+                      <LanguageTags tags={languages} setTags={setLanguages} setCanDispatch={setCanDispatch} />
                       <button
-                        className="font-semibold text-purple-600 hover:text-purple-700"
+                        className="ml-2 font-semibold text-purple-600 hover:text-purple-700"
                         onClick={() => handleSave("available_languages")}
                       >
                         Save
@@ -241,7 +254,7 @@ const SingleGame: React.FC = () => {
                       <input
                         type="number"
                         defaultValue={game.word_count}
-                        className={`rounded-md px-5 py-4 w-full border hover:border-gray-600`}
+                        className={`rounded-md px-5 py-2 w-full border hover:border-gray-600`}
                       />
                       <button
                         className="font-semibold text-purple-600 hover:text-purple-700"
@@ -266,10 +279,22 @@ const SingleGame: React.FC = () => {
                 <button
                   type="button"
                   className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                  onClick={() => setEditable(toggleAll)}
+                  onClick={() => {
+                    setEditable(isEditMode ? setFalse : setTrue);
+                    setLanguages(game.available_languages);
+                  }}
                 >
-                  <PencilAltIcon className="w-5 h-5" />
-                  <span>Update Game</span>
+                  {isEditMode ? (
+                    <>
+                      <StopIcon className="w-5 h-5" />
+                      <span>Cancel Update</span>
+                    </>
+                  ) : (
+                    <>
+                      <PencilAltIcon className="w-5 h-5" />
+                      <span>Update Game</span>
+                    </>
+                  )}
                 </button>
               </div>
             </dl>

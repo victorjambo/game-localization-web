@@ -1,4 +1,4 @@
-const getBackgroundColor = (str: any) => {
+export const getBackgroundColor = (str: any) => {
   let stringUniqueHash = [...str].reduce((acc, char) => {
     return char.charCodeAt(0) + ((acc << 5) - acc);
   }, 0);

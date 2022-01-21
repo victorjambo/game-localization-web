@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import Modal from "@/components/modal";
@@ -6,6 +6,7 @@ import moment from "moment";
 import { createGame } from "@/state/games/thunkActions";
 import { appendGame } from "@/state/games/slice";
 import { useDispatch } from "react-redux";
+import LanguageTags from "../languages/LanguageTags";
 
 interface IProps {
   openModal: boolean;
@@ -22,14 +23,26 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
   const [startDate, setStartDate] = useState(new Date());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const [languages, setLanguages] = useState<string[]>([]);
+  const [langError, setLangError] = useState(false);
 
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (languages.length) {
+      setLangError(false);
+    }
+  }, [languages.length]);
+
   const onSubmit = async (data: any) => {
+    if (!languages.length) {
+      setLangError(true);
+      return;
+    }
     setLoading(true);
     const response = await createGame({
       name: data.gameName,
-      available_languages: data.languages.split(","),
+      available_languages: languages,
       word_count: data.words,
       release_date: moment(startDate).format(),
     });
@@ -64,6 +77,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 <input
                   type="text"
                   id="gameName"
+                  placeholder="Name"
                   className={`rounded-md px-5 py-4 w-full border ${
                     errors.gameName ? "border-red-500" : "border-gray-400"
                   } hover:border-gray-600`}
@@ -104,19 +118,9 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
               >
                 Languages
               </label>
-              <div className="mt-1">
-                <input
-                  type="text"
-                  id="languages"
-                  className={`rounded-md px-5 py-4 w-full border ${
-                    errors.languages ? "border-red-500" : "border-gray-400"
-                  } hover:border-gray-600`}
-                  {...register("languages", { required: true })}
-                />
-              </div>
+              <LanguageTags tags={languages} setTags={setLanguages} />
               <p className="text-red-500 text-xs">
-                {errors.languages?.type === "required" &&
-                  "languages is required"}
+                {langError && "languages is required"}
               </p>
             </div>
 
@@ -131,6 +135,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 <input
                   type="number"
                   id="words"
+                  placeholder="words"
                   className={`rounded-md px-5 py-4 w-full border ${
                     errors.words ? "border-red-500" : "border-gray-400"
                   } hover:border-gray-600`}
@@ -149,14 +154,19 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                 className="py-3 px-6 bg-gray-200 hover:bg-gray-300 text-center rounded-md"
                 onClick={handleCancel}
                 type="reset"
+                disabled={loading}
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="py-3 px-6 bg-purple-600 hover:bg-purple-700 text-center rounded-md text-white"
+                className="flex flex-row items-center space-x-2 py-3 px-6 bg-purple-600 hover:bg-purple-700 text-center rounded-md text-white"
+                disabled={loading}
               >
-                Create
+                {loading && (
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                )}
+                <span>Create</span>
               </button>
             </div>
           </div>
