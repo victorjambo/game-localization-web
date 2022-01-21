@@ -44,7 +44,7 @@ const gamesSlice = createSlice({
   initialState,
   reducers: {
     appendGame(state, action: PayloadAction<IGame>) {
-      state.games.push(action.payload)
+      state.games.unshift(action.payload)
     },
     updateGameField(state, action: PayloadAction<{field: string, value: string}>) {
       const { field, value } = action.payload;

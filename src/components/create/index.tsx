@@ -25,7 +25,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
 
   const dispatch = useDispatch();
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: any) => {
     setLoading(true);
     const response = await createGame({
       name: data.gameName,
