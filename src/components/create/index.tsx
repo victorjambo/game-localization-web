@@ -3,6 +3,9 @@ import { useForm } from "react-hook-form";
 import DatePicker from "react-datepicker";
 import Modal from "../modal";
 import moment from "moment";
+import { createGame } from "../../state/games/thunkActions";
+import { appendGame } from "../../state/games/slice";
+import { useDispatch } from "react-redux";
 
 interface IProps {
   openModal: boolean;
@@ -17,8 +20,27 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
     formState: { errors },
   } = useForm();
   const [startDate, setStartDate] = useState(new Date());
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
 
-  const onSubmit = (data) => console.log(data, moment(startDate).format());
+  const dispatch = useDispatch();
+
+  const onSubmit = async (data) => {
+    setLoading(true);
+    const response = await createGame({
+      name: data.gameName,
+      available_languages: data.languages.split(","),
+      word_count: data.words,
+      release_date: moment(startDate).format(),
+    });
+    if (response) {
+      dispatch(appendGame(response));
+      setOpenModal(false);
+    } else {
+      setError(false);
+    }
+    setLoading(false);
+  };
 
   const handleCancel = () => {
     setOpenModal(false);
@@ -93,7 +115,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                   type="text"
                   id="languages"
                   className={`rounded-md px-5 py-4 w-full border ${
-                    errors.gameName ? "border-red-500" : "border-gray-400"
+                    errors.languages ? "border-red-500" : "border-gray-400"
                   } hover:border-gray-600`}
                   {...register("languages", { required: true })}
                 />
@@ -116,7 +138,7 @@ const CreateGame: React.FC<IProps> = ({ openModal, setOpenModal }) => {
                   type="number"
                   id="words"
                   className={`rounded-md px-5 py-4 w-full border ${
-                    errors.gameName ? "border-red-500" : "border-gray-400"
+                    errors.words ? "border-red-500" : "border-gray-400"
                   } hover:border-gray-600`}
                   {...register("words", { min: 0, required: true })}
                 />

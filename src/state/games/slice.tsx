@@ -31,7 +31,11 @@ const initialState: IGamesState = {
 const gamesSlice = createSlice({
   name: "modal",
   initialState,
-  reducers: {},
+  reducers: {
+    appendGame(state, action: PayloadAction<IGame>) {
+      state.games.push(action.payload)
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(
@@ -66,5 +70,5 @@ const gamesSlice = createSlice({
   },
 });
 
-// export const {} = gamesSlice.actions;
+export const { appendGame } = gamesSlice.actions;
 export default gamesSlice.reducer;

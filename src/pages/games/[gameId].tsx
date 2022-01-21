@@ -10,11 +10,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import Languages from "../../components/languages";
 import moment from "moment";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchGame } from "../../state/games/thunkActions";
+import { deleteGame, fetchGame } from "../../state/games/thunkActions";
 import { AppState } from "@/state";
 import Loader from "../../components/loader";
+import Modal from "../../components/modal";
 
 const SingleGame: React.FC = () => {
   const router = useRouter();
@@ -23,6 +24,8 @@ const SingleGame: React.FC = () => {
     query: { gameId },
   } = router;
 
+  const [isDeleteModal, closeDeleteModal] = useState(false);
+
   const {
     gamesReducer: { game, loadingGame: loading, gameNotFound },
   } = useSelector((state: AppState) => state);
@@ -30,6 +33,13 @@ const SingleGame: React.FC = () => {
   useEffect(() => {
     dispatch(fetchGame(gameId as string));
   }, [dispatch, gameId]);
+
+  const handleDelete = async () => {
+    const response = await deleteGame(gameId as string);
+    if (response === 204) {
+      router.push("/games")
+    }
+  };
 
   return (
     <>
@@ -47,6 +57,7 @@ const SingleGame: React.FC = () => {
               <button
                 type="button"
                 className="order-0 inline-flex space-x-1 items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                onClick={() => closeDeleteModal(true)}
               >
                 <TrashIcon className="w-5 h-5" />
                 <span>Delete Game</span>
@@ -139,6 +150,28 @@ const SingleGame: React.FC = () => {
           </div>
         )}
       </div>
+      <Modal
+        isOpen={isDeleteModal}
+        handleCloseModal={() => null}
+        title="Confirm delete"
+      >
+        <div className="flex flex-row justify-end mt-10 space-x-4">
+          <button
+            className="py-3 px-6 bg-gray-200 hover:bg-gray-300 text-center rounded-md"
+            onClick={() => closeDeleteModal(false)}
+            type="reset"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            className="py-3 px-6 bg-red-500 hover:bg-red-600 text-center rounded-md text-white"
+            onClick={handleDelete}
+          >
+            Delete
+          </button>
+        </div>
+      </Modal>
     </>
   );
 };

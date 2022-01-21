@@ -18,3 +18,15 @@ export const fetchGame = createAsyncThunk(
       .catch(() => false)
   }
 )
+
+export const deleteGame = async (gameId: string) => {
+  return await http.delete(`/games/${gameId}`)
+    .then(res => res.status)
+    .catch(() => false)
+}
+
+export const createGame = async (game) => {
+  return await http.post(`/games`, game)
+    .then(res => res.data)
+    .catch(() => false)
+}
